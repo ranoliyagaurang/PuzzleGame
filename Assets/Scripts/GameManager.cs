@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> endPoints = new();
     public GameObject levelCompletePanel;
     public LevelScriptable levelScriptable;
+    public TMP_Text levelText;
     public int currentLevel;
     public LevelData level;
     bool newLevel;
@@ -24,7 +26,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-
         Instance = this;
         levelCompletePanel.SetActive(false);
     }
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
         bloom.active = false;
         currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
         level = levelScriptable.levels[currentLevel - 1];
+        levelText.text = currentLevel.ToString();
 
         GeneratePuzzle();
 
@@ -68,9 +70,11 @@ public class GameManager : MonoBehaviour
 
             for (int h = 0; h < puzzle.height; h++)
             {
-                level.pieceDatas[h] = new LevelData.PieceData();
-                level.pieceDatas[h].rotationValues = new Vector3[puzzle.width];
-                level.pieceDatas[h].prefabs = new GameObject[puzzle.width];
+                level.pieceDatas[h] = new()
+                {
+                    rotationValues = new Vector3[puzzle.width],
+                    prefabs = new GameObject[puzzle.width]
+                };
 
                 for (int w = 0; w < puzzle.width; w++)
                 {
@@ -84,13 +88,14 @@ public class GameManager : MonoBehaviour
 
                     #endregion
 
-                    #region restriction for height
+                    #region Restriction for Height
 
                     if (h == 0) defaultValues[2] = 0;
                     else defaultValues[2] = puzzle.piece[w, h - 1].connectValues[0];
 
                     if (h == puzzle.height - 1) defaultValues[0] = 0;
                     else defaultValues[0] = Random.Range(0, 2);
+
                     #endregion
 
                     int totalValue = defaultValues[0] + defaultValues[1] + defaultValues[2] + defaultValues[3];
@@ -157,10 +162,12 @@ public class GameManager : MonoBehaviour
 
                     puzzle.piece[w, h] = piece.GetComponent<Piece>();
                     puzzle.piece[w, h].transform.localEulerAngles = level.pieceDatas[h].rotationValues[w]; //assign rotations from scriptable
+                    puzzle.piece[w, h].SetRotation();
+                    puzzle.piece[w, h].ManualRotate();
                 }
             }
+            puzzle.winValue = level.puzzle.winValue;
         }
-        puzzle.winValue = level.puzzle.winValue;
     }
 
     void Shuffle() //shuffle rotation
@@ -173,6 +180,7 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < j; i++)
                 {
                     piece.RotatePiece(0);
+                    piece.SetRotation();
                 }
             }
             Invoke(nameof(AddRotationValues), 0.5f);
@@ -202,7 +210,6 @@ public class GameManager : MonoBehaviour
     public int Sweep() //randomize rotation when generating a level
     {
         int value = 0;
-
         for (int h = 0; h < puzzle.height; h++)
         {
             for (int w = 0; w < puzzle.width; w++)
@@ -228,10 +235,9 @@ public class GameManager : MonoBehaviour
         return value;
     }
 
-    public int QuickSweep(int w, int h)
+    public int QuickSweep(int w, int h) // connected value for particular piece
     {
         int value = 0;
-
         if (h != puzzle.height - 1)
         {
             if (puzzle.piece[w, h].connectValues[0] == 1 && puzzle.piece[w, h + 1].connectValues[2] == 1)
@@ -263,7 +269,6 @@ public class GameManager : MonoBehaviour
                 value++;
             }
         }
-
         return value;
     }
 

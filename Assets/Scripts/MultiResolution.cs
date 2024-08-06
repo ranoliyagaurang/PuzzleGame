@@ -14,8 +14,6 @@ public class MultiResolution : MonoBehaviour
 
     public void Awake()
     {
-        //Debug.Log("DeviceTypeChecker ::: " + DeviceTypeChecker.GetDeviceType());
-
         if (DeviceTypeChecker.GetDeviceType() == ENUM_Device_Type.Tablet)
         {
             CalculateScaleFactor();
@@ -24,8 +22,6 @@ public class MultiResolution : MonoBehaviour
         }
         else
             ScaleFactor = 1;
-
-       //Debug.Log("ScaleFactor :: " + ScaleFactor);
     }
 
     void SetupWorld()
@@ -39,12 +35,7 @@ public class MultiResolution : MonoBehaviour
     void SetupCamera()
     {
         float l_CameraYPos = Screen.height / (2f * 100);
-        //float l_CameraYPos = Screen.width / (2.0f * Constant.PIXEL_PER_UNIT);
         float l_AspectRation = Screen.width / (float)Screen.height;
-        //float l_CameraXpos = l_CameraYPos * l_AspectRation;
-
-        //Debug.Log("l_CameraXpos ::: " + l_AspectRation);
-        //Debug.Log("l_CameraYPos ::: " + l_CameraYPos);
 
         m_Camera.orthographicSize = l_CameraYPos;
     }
@@ -54,9 +45,6 @@ public class MultiResolution : MonoBehaviour
     {
         float l_HeightComponent = m_MatchHeight * (Screen.height / 1920);
         float l_WidthComponent = (1.0f - m_MatchHeight) * (Screen.width / 1080);
-
-        //Debug.Log("l_HeightComponent ::: " + l_HeightComponent);
-        //Debug.Log("l_WidthComponent ::: " + l_WidthComponent);
 
         ScaleFactor = l_HeightComponent + l_WidthComponent;
     }

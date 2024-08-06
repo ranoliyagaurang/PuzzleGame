@@ -16,8 +16,8 @@ public class LevelPanel : MonoBehaviour
     {
         Application.targetFrameRate = 60;  //increase fps from 30[default] to 60
         Instance = this;
-        currentLevel = PlayerPrefs.GetInt("CurrentLevel", 10);  //current level user is in
-        maxLevel = PlayerPrefs.GetInt("MaxLevel", 10); //max level unlocked by user
+        currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);  //current level user is in
+        maxLevel = PlayerPrefs.GetInt("MaxLevel", 1); //max level unlocked by user
     }
 
     void Start() //instantiate buttons according to current level and max unlocked level

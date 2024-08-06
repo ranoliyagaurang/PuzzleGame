@@ -15,7 +15,7 @@ MonoBehaviour:
   levels:
   - puzzle:
       winValue: 2
-      currentValue: 2
+      currentValue: 1
       width: 2
       height: 2
     pieceDatas:

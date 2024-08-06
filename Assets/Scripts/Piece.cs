@@ -8,32 +8,53 @@ public class Piece : MonoBehaviour, IPointerClickHandler
     public int[] connectValues;
     public float rotationSpeed;
 
-    float rotation;
+    public float rotation;
+
+    public void SetRotation()
+    {
+        rotation = transform.localEulerAngles.z;
+    }
+    public void ManualRotate()
+    {
+        int angle = (int)rotation;
+        while (angle > 0)
+        {
+            angle -= 90;
+            RotateConnectValues();
+        }
+    }
 
     public void OnPointerClick(PointerEventData eventData) //when user clicks on a piece
     {
         int difference = 0;
-        difference -= GameManager.Instance.QuickSweep((int)transform.position.x, (int)transform.position.y);
-
-        RotatePiece(rotationSpeed);
-
-        difference += GameManager.Instance.QuickSweep((int)transform.position.x, (int)transform.position.y);
-
-        GameManager.Instance.puzzle.currentValue += difference;
-
-        if (GameManager.Instance.puzzle.currentValue == GameManager.Instance.puzzle.winValue)
+        SoundManager.instance.PlaySFX(SoundManager.instance.rotatePiece);
+        if (GameManager.Instance.puzzle.currentValue != GameManager.Instance.puzzle.winValue)
         {
-            GameManager.Instance.BlinkAnimation(true);
-            GameManager.Instance.bloom.active = true;
-            Invoke(nameof(EnableLevelCompletePanel), 1f);
+            difference -= GameManager.Instance.QuickSweep((int)transform.localPosition.x, (int)transform.localPosition.y);
+
+            RotatePiece(rotationSpeed);
+
+            difference += GameManager.Instance.QuickSweep((int)transform.localPosition.x, (int)transform.localPosition.y);
+
+            GameManager.Instance.puzzle.currentValue += difference;
         }
+
     }
 
     public void RotatePiece(float rotationSpeed) //rotate piece method using do tween
     {
         rotation += 90;
-        transform.DORotate(new Vector3(0, 0, rotation), rotationSpeed);
-        //transform.rotation = Quaternion.Euler(0, 0, rotation);
+        transform.DOLocalRotate(new Vector3(0, 0, rotation), rotationSpeed).OnComplete(() =>
+        {
+            if (GameManager.Instance.puzzle.currentValue == GameManager.Instance.puzzle.winValue)
+            {
+                GameManager.Instance.BlinkAnimation(true);
+                GameManager.Instance.bloom.active = true;
+                SoundManager.instance.PlaySFX(SoundManager.instance.levelWin);
+                Invoke(nameof(EnableLevelCompletePanel), 1f);
+            }
+        });
+
         RotateConnectValues();
     }
 
